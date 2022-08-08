@@ -8,20 +8,23 @@ function send_request(base, to) {
         , 'path': `/economy/exchange?int=1&to=${to}&base=${base}`
     }
 
-    var req = http.request(options, res => {
-        let chunks = []
+    return new Promise((resolve,reject) => {
+        var req = http.request(options, res => {
+            let chunks = []
+    
+            res.on('data', chunk => {
+                chunks.push(chunk)
+            })
+    
+            res.on('end', () => {
+                let body = Buffer.concat(chunks)
+                resolve(body.toString())
+            })
 
-        res.on('data', chunk => {
-            chunks.push(chunk)
+            res.on('error', e => reject(e))
         })
+    }).finally(() => req.end())
 
-        res.on('end', () => {
-            let body = Buffer.concat(chunks)
-            console.log(body.toString())
-        })
-    })
-
-    req.end()
 }
 
 module.exports = { send_request }
