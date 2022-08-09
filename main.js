@@ -1,4 +1,5 @@
 import exchange_service from './exchange_service.js'
+import currency_to_all from './currency_to_all.js'
 import rl from 'readline-promise'
 const readline = rl.default
 const read_line = readline.createInterface({
@@ -9,32 +10,34 @@ const read_line = readline.createInterface({
 import { api_key } from './api_key.js'
 
 async function serve(service) {
-    service = service.toString().trim()
+
+    service = service.toString().replace(/\s+/g, '').toLowerCase()
     want_to_quit(service)
+
+    async function choose_base() {
+        let base = await read_line.questionAsync('Choose your base: ')
+        want_to_quit(base)
+        // We will trim and change to uppercase here
+        base = base.trim().toUpperCase()
+        return base
+    }
+
+    async function choose_to() {
+        let to = await read_line.questionAsync('Choose your to: ')
+        want_to_quit(to)
+        to = to.trim().toUpperCase()
+        return to
+    }
+
+    async function choose_amount() {
+        let amount = await read_line.questionAsync('Enter the amount: ')
+        want_to_quit(amount)
+        amount = amount.trim()
+        return amount
+    }
+
     switch (service) {
-        case 'exchange':
-
-            async function choose_base() {
-                let base = await read_line.questionAsync('Choose your base: ')
-                want_to_quit(base)
-                // We will trim and change to uppercase here
-                base = base.trim().toUpperCase()
-                return base
-            }
-
-            async function choose_to() {
-                let to = await read_line.questionAsync('Choose your to: ')
-                want_to_quit(to)
-                to = to.trim().toUpperCase()
-                return to
-            }
-
-            async function choose_amount() {
-                let amount = await read_line.questionAsync('Enter the amount: ')
-                want_to_quit(amount)
-                amount = amount.trim()
-                return amount
-            }
+        case 'exchange': {
 
             //console.log(27)
             let base = await choose_base()
@@ -55,6 +58,25 @@ And the ${amount} ${base} is equivalent to ${amount * rate} ${to}`)
                 .then(inform_user)
                 .then(choose_service)
                 .catch(e => console.error('Warning! Error: ' + e))
+        }
+            break
+
+        case 'currencytoall': {
+
+            let base = await choose_base()
+
+            function inform_user(based_map) {
+                for (let [key, value] of based_map.entries()) {
+                    console.log(`1 ${base} is ${value} ${key}`)
+                }
+            }
+
+            currency_to_all
+                .send_request(base, api_key)
+                .then(inform_user)
+                .then(choose_service)
+                .catch(e => console.error('Warning! Error: ' + e))
+        }
             break
         default:
             console.log('You made an invalid choice')

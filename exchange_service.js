@@ -1,14 +1,16 @@
-import { request } from 'https'
-console.log('B 2')
+import * as http from 'https'
+//console.log('B 2')
 let exchange_parities = new Map()
 
 function send_request(base, to, api_key) {
-    // Make base and to lower cases
+    // Make base and to upper cases
+    /*
     base = base.toUpperCase()
     to = to.toUpperCase()
+    */
 
     let map_key = `${to}_${base}`
-    console.log('B 5')
+    //console.log('B 5')
 
     // If the key already exists in the map, return it
     if (exchange_parities.has(map_key)) {
@@ -32,7 +34,7 @@ function send_request(base, to, api_key) {
 
     return new Promise((resolve, reject) => {
         console.log('Making a new request')
-        var req = request(options, res => {
+        var req = http.request(options, res => {
             let chunks = []
 
             //console.log('B 21')
