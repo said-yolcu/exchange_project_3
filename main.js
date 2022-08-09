@@ -9,39 +9,51 @@ const read_line = readline.createInterface({
 import { api_key } from './api_key.js'
 
 async function serve(service) {
-    service = service.toString().replace(/\s+|\n/g, '')
+    service = service.toString().trim()
+    want_to_quit(service)
     switch (service) {
         case 'exchange':
-            // Do case exchange
-            /*
-            function choose_base() {
-                return new Promise((resolve, reject)=>{
-                    resolve(read_line.question('Choose your base currency'))
-                })
+
+            async function choose_base() {
+                let base = await read_line.questionAsync('Choose your base: ')
+                want_to_quit(base)
+                // We will trim and change to uppercase here
+                base = base.trim().toUpperCase()
+                return base
             }
-            function choose_to(base) {
-                return new Promise((resolve, reject)=>{
-                    resolve(read_line.question('Choose your to currency'))
-                })
+
+            async function choose_to() {
+                let to = await read_line.questionAsync('Choose your to: ')
+                want_to_quit(to)
+                to = to.trim().toUpperCase()
+                return to
             }
-            */
-            console.log(27)
-            let base = await read_line.questionAsync('Choose your base')
-            console.log(29)
-            let to = await read_line.questionAsync('Choose your to')
-            console.log(31)
-            let amount = await read_line.questionAsync('Enter the amount')
+
+            async function choose_amount() {
+                let amount = await read_line.questionAsync('Enter the amount: ')
+                want_to_quit(amount)
+                amount = amount.trim()
+                return amount
+            }
+
+            //console.log(27)
+            let base = await choose_base()
+            //console.log(29)
+            let to = await choose_to()
+            //console.log(31)
+            let amount = await choose_amount()
             amount = Number(amount)
 
             function inform_user(rate) {
                 rate = Number(rate)
                 console.log(`The exchange rate is ${rate}.
-And the ${amount} ${base} is equivalent to ${amount * rate}`)
+And the ${amount} ${base} is equivalent to ${amount * rate} ${to}`)
             }
 
             exchange_service
                 .send_request(base, to, api_key)
                 .then(inform_user)
+                .then(choose_service)
                 .catch(e => console.error('Warning! Error: ' + e))
             break
         default:
@@ -50,10 +62,19 @@ And the ${amount} ${base} is equivalent to ${amount * rate}`)
     }
 }
 
+function want_to_quit(word) {
+    if (word.toLowerCase().trim() === 'quit') {
+        console.log('You chose to quit. Bye bye!')
+        read_line.close()
+        process.exit()
+    }
+}
 
 function choose_service() {
     read_line.question('Which service would you like to use?\n\
-Write one of these: exchange, ...', serve)
+Write one of these: exchange, ...\n\
+If you want to quit, type quit any time ', serve)
 }
+
 
 choose_service()
