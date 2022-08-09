@@ -1,5 +1,7 @@
 import exchange_service from './exchange_service.js'
 import currency_to_all from './currency_to_all.js'
+import symbols from './symbols.js'
+
 import rl from 'readline-promise'
 const readline = rl.default
 const read_line = readline.createInterface({
@@ -58,8 +60,7 @@ And the ${amount} ${base} is equivalent to ${amount * rate} ${to}`)
                 .then(inform_user)
                 .then(choose_service)
                 .catch(e => console.error('Warning! Error: ' + e))
-        }
-            break
+        } break;
 
         case 'currencytoall': {
 
@@ -76,8 +77,21 @@ And the ${amount} ${base} is equivalent to ${amount * rate} ${to}`)
                 .then(inform_user)
                 .then(choose_service)
                 .catch(e => console.error('Warning! Error: ' + e))
-        }
-            break
+        } break;
+
+        case 'symbols': {
+
+            function inform_user(symbols_map) {
+                console.log(symbols_map)
+            }
+
+            symbols
+                .send_request(api_key)
+                .then(inform_user)
+                .then(choose_service)
+                .catch(e => console.error('Warning! Error: ' + e))
+        } break;
+
         default:
             console.log('You made an invalid choice')
             choose_service()
@@ -94,7 +108,7 @@ function want_to_quit(word) {
 
 function choose_service() {
     read_line.question('Which service would you like to use?\n\
-Write one of these: exchange, ...\n\
+Write one of these: exchange, currency to all, symbols ...\n\
 If you want to quit, type quit any time ', serve)
 }
 

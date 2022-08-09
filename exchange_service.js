@@ -55,7 +55,7 @@ function send_request(base, to, api_key) {
                 console.log(body)
                 exchange_parities.set(map_key
                     , body
-                        .match(/(?<="rate":")(\d.\d+)(?=")/gi))
+                        .match(/(?<="rate":")(\d+.\d+)(?=")/gi))
                 resolve(exchange_parities.get(map_key))
                 console.log(exchange_parities.get(map_key))
             })
@@ -66,8 +66,9 @@ function send_request(base, to, api_key) {
             })
         })
         req.end()
-    })
-        .catch(e => console.log('Catched error ' + e))
+
+    }).catch(e => console.log('Catched error ' + e))
+
 }
 
 export default { send_request }

@@ -1,55 +1,57 @@
 import * as http from 'https'
 
-let currencies_to_all = new Map()
+let symbols_map
 
-function send_request(base, api_key) {
-
-    if (currencies_to_all.has(base)) {
-        console.log('Returning from map ')
+function send_request(api_key) {
+    //console.log(6)
+    if (symbols_map) {
+        console.log('Returning from map')
         return new Promise((resolve, reject) => {
-            resolve(currencies_to_all.get(base))
+            resolve(symbols_map)
         })
     }
+    //console.log(12)
 
     var options = {
         "method": "GET",
         "hostname": "api.collectapi.com",
         "port": null,
-        "path": `/economy/currencyToAll?int=10&base=${base}`,
+        "path": "/economy/symbols",
         "headers": {
             "content-type": "application/json",
             "authorization": api_key
         }
     }
-
+    //console.log(24)
     return new Promise((resolve, reject) => {
         console.log('Making a new request')
         let req = http.request(options, res => {
-            var chunks = []
-
+            let chunks = []
+            //console.log(28)
             res.on('data', chunk => {
                 chunks.push(chunk)
+                //console.log(31)
             })
 
             res.on('end', () => {
-                let based_map = new Map()
-
                 let body = Buffer.concat(chunks)
                 body = JSON.parse(body)
+                //console.log(37)
+                symbols_map = new Map()
 
-                for (let currency of body.result.data) {
-                    based_map.set(currency.code, currency.rate)
+                for (let currency of body.result) {
+                    symbols_map.set(currency.code, currency.name)
                 }
-                currencies_to_all.set(base, based_map)
-                // console.log(currencies_to_all.get(base))
-                resolve(currencies_to_all.get(base))
+                //console.log(symbols_map)
+                resolve(symbols_map)
             })
-
+            //console.log(46)
             res.on('error', e => {
-                console.log('Currency to all service error')
+                console.log('Symbols service error')
                 reject(e)
             })
         })
+        // Never forget request.end()!!
         req.end()
 
     }).catch(e => console.log('Catched error ' + e))
