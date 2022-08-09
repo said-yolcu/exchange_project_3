@@ -34,6 +34,7 @@ async function serve(service) {
             amount = Number(amount)
 
             function inform_user(rate) {
+                rate = Number(rate)
                 console.log(`The exchange rate is ${rate}.
 And the ${amount} ${base} is equivalent to ${amount * rate}`)
             }

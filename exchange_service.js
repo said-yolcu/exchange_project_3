@@ -41,9 +41,9 @@ function send_request(base, to, api_key) {
                 console.log(body.toString())
                 exchange_parities.set(map_key
                     , body.toString()
-                        .match(/rate/gi)[0])
+                        .match(/(?<="rate":")(\d).(\d+)(?=")/gi))
                 resolve(exchange_parities.get(map_key))
-                console.log(body.toString())
+                console.log(exchange_parities.get(map_key))
             })
 
             res.on('error', e => {
